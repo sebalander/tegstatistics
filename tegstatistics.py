@@ -26,7 +26,7 @@ promedio=[[np.average(Lo),np.average(Lu)],[np.average(Go),np.average(Se)]]
 
 
 
-def savehistfigure():
+def savehistfigure(Dat,Jugadores,tiradas,promedio):
 	'''
 	Function that plots the histogram for each player.
 	'''
@@ -61,6 +61,54 @@ def savehistfigure():
 	plt.savefig('histogramas.png')
 
 
+def comparemodels(Dat,Jugadores):
+	'''
+	I propose two models for the probability of each dice face.
+	Model 0 consists of equal constant probability for each face
+	(1/6). Model 1 describes the probability of each face as a
+	linear function of the number of the face (to test if some 
+	people have greater/lower probability of getting higher 
+	scores).
+	This function returns the ratio P(Mod1|Data)/P(Mod0|Data) and 
+	also graphs the probability distribution of the slope of the 
+	linear function.
+	'''
+	
+	# get frequency of appearance of each score
+	freq=np.ndarray([2,2,6]) # variable to save feqs
+	for i in range(2):
+		for j in range(2):
+			freq[i,j]=np.histogram(Dat[i][j],6,(0.5,6.5))[0]
+	
+	atics=20 # Number of intervals to plot a
+	a_range=np.linspace(0,7.0/12,atics) # range of posible slopes
+	prob_a=np.ndarray([2,2,atics]) # to save prob dist of a
+	
+	# calculate prob dist of slope for each player
+	for i in range(2):
+		for j in range(2):
+			# evaluate probability at each a
+			# function comes out from ...
+			prob_a[i,j]=[
+				np.sum([ ((l-3.5)*a_range[k]+1.0/6)**freq[i][j]
+				 for l in range(1,7)])
+				for k in range(atics)]
+	
+	# now plot
+	fig, axis = plt.subplots(2,2)# create four plots
+	for i in range(2):
+		for j in range(2):
+			# leyend to be displayed on graph
+#			axis[i,j].set_yticklabels([])
+#			axis[i,j].set_ylim([0,0.3])
+#			axis[i,j].set_yticks([])
+#			axis[i,j].set_xticklabels(xlabels)
+#			axis[i,j].text(0.3, 0.23, txt)
+			axis[i,j].set_title(Jugadores[i][j])
+#			axis[i,j].plot([0.5,6.5],[prob, prob])
+			axis[i,j].plot(a_range,prob_a[i][j])
+	# once constructed all four histograms, save image
+	plt.savefig('aProbdist.png')
 
 
 
@@ -68,8 +116,7 @@ def savehistfigure():
 
 
 
-
-
+comparemodels(Dat,Jugadores)
 
 
 
