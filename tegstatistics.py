@@ -5,9 +5,7 @@ sequence of dice numbers rolled during a TEG game. The primary goal is
 to find out if different playes tend to score differently. I start by 
 making a histogram of each player's performance.
 
-Part of the code in the function savehistfigure is adapted from the code posted as an answer in Stack Overflow. The lines that were
-
-Question by user bioslime on Aug 2 '12 at 9:39. The code was originally posted in the answer by user imsc on Aug 2 '12 at 10:37.
+Part of the code in the function savehistfigure is adapted from the code posted as an answer in Stack Overflow. The lines that were remixed from the original code have been properly indicated.The question was made by user bioslime on Aug 2 '12 at 9:39. The code was originally posted in the answer by user imsc on Aug 2 '12 at 10:37.
 
 Question page: http://stackoverflow.com/questions/11774822/matplotlib-histogram-with-errorbars
 User bioslime profile page: http://stackoverflow.com/users/1565662/bioslime
@@ -55,9 +53,11 @@ def savehistfigure(Dat,Jugadores):
   # loop
   for i in range(2):
     for j in range(2):
+      print 'plotting %d %d'%(i,j)
       # leyend to be displayed on graph
       txt='%d tiradas\npromedio %1.2f'%(tiradas[i][j],promedio[i][j])
-      axis[i,j].set_yticklabels([])
+      axis[i,j].set_yticks([0,1/6.0])
+      axis[i,j].set_yticklabels(['0','1/6'])
       axis[i,j].set_ylim([0,0.3])
       axis[i,j].set_yticks([])
       axis[i,j].set_xticklabels(xlabels)
@@ -65,22 +65,29 @@ def savehistfigure(Dat,Jugadores):
       axis[i,j].set_title(Jugadores[i][j])
       axis[i,j].plot([0.5,6.5],[prob, prob])
       
+      
+      ### Code attributed to user imsc in an answer to user bioslime's
+      ### question in Stack Overflow, starts on this line until the line
+      ### appropiately indicated.
       # compute histogram
       y,bin_edges=np.histogram(
         Dat[i][j],
         bins=bins, 
-        normed=True)
-      
+        normed=False)
+        
       # compute center of bins
       bin_centers = 0.5*(bin_edges[1:] + bin_edges[:-1])
       
       # now plot bars with error bars
-      plt.errorbar(
+      axis[i,j].bar(
         bin_centers,
-        y,
-        yerr = y**0.5,
-        marker = '.',
-        drawstyle = 'steps-mid-')
+        y*1.0/tiradas[i][j],
+        yerr = y**0.5/tiradas[i][j])
+#        marker = '.')
+#        drawstyle = 'steps-mid-')
+      
+      ### End of the code attributed to user imsc in an answer to user
+      ### bioslime's question in Stack Overflow.
       
 #      axis[i,j].hist(
 #        Dat[i][j], 
@@ -89,9 +96,14 @@ def savehistfigure(Dat,Jugadores):
 #        histtype='bar', 
 #        align='mid', 
 #        rwidth=0.9)
+      print 'plotting %d %d'%(i,j)
   # once constructed all four histograms, save image
   plt.savefig('histogramas2.png')
   plt.show()
+
+
+
+
 
 
 def comparemodels01(Dat,Jugadores):
